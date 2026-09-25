@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<title>Authorization result - blackbabata Studio</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .box { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 12px 0; word-break: break-all; font-family: ui-monospace, Consolas, monospace; font-size: 0.95rem; }
+  button { font: inherit; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--accent); color: #1c1e26; font-weight: 600; cursor: pointer; }
+  .err { color: #d64545; }
+</style>
+</head>
+<body>
+<main>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="privacy.html">Privacy Policy</a>
+  </nav>
+
+  <h1>Authorization result</h1>
+  <p class="muted">This page only displays what TikTok returned in the address bar. Nothing on this page is sent anywhere.</p>
+
+  <div id="result"></div>
+
+  <footer>&copy; 2026 blackbabata. Not affiliated with or endorsed by TikTok.</footer>
+</main>
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var code = params.get("code");
+  var state = params.get("state");
+  var error = params.get("error");
+  var description = params.get("error_description");
+  var out = document.getElementById("result");
+
+  function line(label, value) {
+    var p = document.createElement("p");
+    p.textContent = label;
+    var box = document.createElement("div");
+    box.className = "box";
+    box.textContent = value;
+    out.appendChild(p);
+    out.appendChild(box);
+    return box;
+  }
+
+  if (error) {
+    var p = document.createElement("p");
+    p.className = "err";
+    p.textContent = "Authorization failed: " + error + (description ? " - " + description : "");
+    out.appendChild(p);
+  } else if (code) {
+    line("Authorization code (paste it into the local tool; it is single-use and expires quickly):", code);
+    if (state) { line("State (the tool compares this with the value it generated):", state); }
+    var btn = document.createElement("button");
+    btn.textContent = "Copy code";
+    btn.onclick = function () {
+      navigator.clipboard.writeText(code).then(function () { btn.textContent = "Copied"; });
+    };
+    out.appendChild(btn);
+    var warn = document.createElement("p");
+    warn.className = "muted";
+    warn.textContent = "Do not share this code with anyone.";
+    out.appendChild(warn);
+  } else {
+    var none = document.createElement("p");
+    none.textContent = "No authorization response found. Start the authorization from the local tool.";
+    out.appendChild(none);
+  }
+
+  if (window.history && window.history.replaceState) {
+    window.history.replaceState(null, "", window.location.pathname);
+  }
+})();
+</script>
+</body>
+</html>
