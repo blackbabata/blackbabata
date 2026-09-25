@@ -17,6 +17,7 @@
 <main>
   <nav>
     <a href="index.html">Home</a>
+    <a href="connect.html">Connect TikTok</a>
     <a href="terms.html">Terms of Service</a>
     <a href="privacy.html">Privacy Policy</a>
   </nav>
@@ -55,7 +56,16 @@
     out.appendChild(p);
   } else if (code) {
     line("Authorization code (paste it into the local tool; it is single-use and expires quickly):", code);
-    if (state) { line("State (the tool compares this with the value it generated):", state); }
+    var saved = null;
+    try { saved = sessionStorage.getItem("tt_state"); } catch (e) {}
+    var check = document.createElement("p");
+    if (saved && state === saved) {
+      check.textContent = "State check passed: this response belongs to the request started from this browser.";
+    } else {
+      check.className = "err";
+      check.textContent = "State check failed: this response does not match a request started from this browser. Do not use this code.";
+    }
+    out.appendChild(check);
     var btn = document.createElement("button");
     btn.textContent = "Copy code";
     btn.onclick = function () {

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Connect TikTok - blackbabata Studio</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  button { font: inherit; padding: 12px 22px; border-radius: 10px; border: 0; background: var(--accent); color: #1c1e26; font-weight: 700; cursor: pointer; }
+  ul.scopes li { margin: 4px 0; }
+  code { font-family: ui-monospace, Consolas, monospace; }
+</style>
+</head>
+<body>
+<main>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="connect.html">Connect TikTok</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="privacy.html">Privacy Policy</a>
+  </nav>
+
+  <h1>Connect TikTok</h1>
+  <p class="muted">For the channel owner. This step lets blackbabata Studio upload the owner's own videos to the owner's own TikTok account.</p>
+
+  <h2>What you will be asked to allow</h2>
+  <ul class="scopes">
+    <li><code>user.info.basic</code> - read the account's display name and avatar, so the tool can show which account will receive the video.</li>
+    <li><code>video.upload</code> - send a video to the account's TikTok inbox as a draft. The account holder reviews and publishes it in the TikTok app.</li>
+  </ul>
+
+  <p><button id="connect" type="button">Connect TikTok account</button></p>
+  <p id="msg" class="muted"></p>
+
+  <h2>What happens next</h2>
+  <ol>
+    <li>TikTok asks you to log in and approve the permissions above.</li>
+    <li>TikTok sends you back to the <a href="callback.html">result page</a>, which shows a one-time authorization code.</li>
+    <li>You paste that code into the local blackbabata Studio tool, which exchanges it for an access token stored only on your own computer.</li>
+  </ol>
+  <p>You can withdraw access at any time in the TikTok app's settings. See the <a href="privacy.html">Privacy Policy</a>.</p>
+
+  <footer>&copy; 2026 blackbabata. Not affiliated with or endorsed by TikTok.</footer>
+</main>
+<script>
+(function () {
+  var CLIENT_KEY = "awtlu69lpqtw8hmc";
+  var REDIRECT_URI = "https://blackbabata.github.io/blackbabata/callback.html";
+  var SCOPE = "user.info.basic,video.upload";
+
+  document.getElementById("connect").addEventListener("click", function () {
+    var msg = document.getElementById("msg");
+    if (!CLIENT_KEY) { msg.textContent = "The client key has not been configured yet."; return; }
+    var bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+    var state = Array.prototype.map.call(bytes, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+    try { sessionStorage.setItem("tt_state", state); } catch (e) {}
+    var url = "https://www.tiktok.com/v2/auth/authorize/" +
+      "?client_key=" + encodeURIComponent(CLIENT_KEY) +
+      "&scope=" + encodeURIComponent(SCOPE) +
+      "&response_type=code" +
+      "&redirect_uri=" + encodeURIComponent(REDIRECT_URI) +
+      "&state=" + encodeURIComponent(state);
+    window.location.href = url;
+  });
+})();
+</script>
+</body>
+</html>
